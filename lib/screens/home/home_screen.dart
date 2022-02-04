@@ -66,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                         itemBuilder: (BuildContext context, int index) {
                           return DecoratedBox(
                             decoration: BoxDecoration(
-                              color: index.isEven ? Colors.red : Colors.green,
+                              color: index.isEven ? Colors.blue : Colors.yellow,
                             ),
                           );
                         },
@@ -209,7 +209,7 @@ class HomeScreen extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return DecoratedBox(
                     decoration: BoxDecoration(
-                      color: index.isEven ? Colors.red : Colors.green,
+                      color: index.isEven ? Colors.blue : Colors.yellow,
                     ),
                   );
                 },

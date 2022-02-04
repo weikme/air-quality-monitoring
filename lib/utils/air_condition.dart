@@ -149,14 +149,7 @@ class AirCondition {
         //   final openedBox = await Hive.openBox(cities[i]);
         //
         //   if (openedBox.isNotEmpty) {
-        //     listOfCityModel.add(CityModel(
-        //       place: openedCheckBox.get('place'),
-        //       airQualityIndex: openedCheckBox.get('airQualityIndex'),
-        //       airQualityLevel: openedCheckBox.get('airQualityLevel'),
-        //       dateTimeYear: openedCheckBox.get('dateTimeYear'),
-        //       dateTimeMonth: openedCheckBox.get('dateTimeMonth'),
-        //       dateTimeDay: openedCheckBox.get('dateTimeDay'),
-        //     ));
+        //TODO: implement data load from hive
         //   }
         // }
       }
