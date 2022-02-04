@@ -1,21 +1,30 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:connectivity/connectivity.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as httpConnector;
 
 class RandomFacts {
-  Uri factUri =
-      Uri(path: 'http://randomuselessfact.appspot.com/random.txt?language=en');
+  String httpMyLink =
+      'http://randomuselessfact.appspot.com/random.json?language=en';
 
   Future<String?> fetchFact() async {
     ConnectivityResult connectivityResult =
         await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
+    if (connectivityResult != ConnectivityResult.none) {
       try {
-        final response = await http.get(factUri);
+        final response = await httpConnector.get(Uri.http(
+            'randomuselessfact.appspot.com', '/random.json?language=en'));
+        final parsedJson = jsonDecode(response.body);
+        log(response.toString());
+        log(response.body.toString());
+        log(response.statusCode.toString());
+        log(parsedJson["text"]);
         if (response.statusCode == 200) {
-          return response.body.toString();
+          return parsedJson["text"];
         }
       } catch (e) {
+        log(e.toString());
         return null;
       }
     }

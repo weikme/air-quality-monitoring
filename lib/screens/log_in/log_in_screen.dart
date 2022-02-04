@@ -1,5 +1,6 @@
-import 'package:cursach_diagrams/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../home/home_screen.dart';
 
 class LogInScreen extends StatelessWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -13,10 +14,10 @@ class LogInScreen extends StatelessWidget {
       child: Center(
         child: ElevatedButton(
           onPressed: () {
-            Navigator.pushNamed(context, HomeScreen.id);
+            Navigator.pushReplacementNamed(context, HomeScreen.id);
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Text('PushMe'),
           ),
         ),

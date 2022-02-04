@@ -1,9 +1,9 @@
-import 'package:cursach_diagrams/screens/log_in/log_in_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 
 import '../../bloc/air_condition_bloc.dart';
 import '../global/loader_widget.dart';
+import '../log_in/log_in_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const String id = 'splash_screen';

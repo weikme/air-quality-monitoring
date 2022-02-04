@@ -1,8 +1,9 @@
 import 'dart:developer';
 
 import 'package:air_quality/air_quality.dart';
-import 'package:cursach_diagrams/hive_models/city_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import '../hive_models/city_model.dart';
 
 class AirCondition {
   List<AirQualityData> _airQualityFromCityList = [];
@@ -85,15 +86,23 @@ class AirCondition {
     DateTime currentTime = DateTime.now();
 
     try {
-      final openedCheckBox = await Hive.openBox(cities.first);
+      final openedCheckBox = await Hive.openBox<CityModel>(cities.first);
       CityModel? checkBoxInfo = openedCheckBox.isNotEmpty
           ? CityModel(
-              place: openedCheckBox.get('place'),
-              airQualityIndex: openedCheckBox.get('airQualityIndex'),
-              airQualityLevel: openedCheckBox.get('airQualityLevel'),
-              dateTimeYear: openedCheckBox.get('dateTimeYear'),
-              dateTimeMonth: openedCheckBox.get('dateTimeMonth'),
-              dateTimeDay: openedCheckBox.get('dateTimeDay'),
+              place: openedCheckBox.getAt(openedCheckBox.length - 1)?.place,
+              airQualityIndex: openedCheckBox
+                  .getAt(openedCheckBox.length - 1)
+                  ?.airQualityIndex,
+              airQualityLevel: openedCheckBox
+                  .getAt(openedCheckBox.length - 1)
+                  ?.airQualityLevel,
+              dateTimeYear:
+                  openedCheckBox.getAt(openedCheckBox.length - 1)!.dateTimeYear,
+              dateTimeMonth: openedCheckBox
+                  .getAt(openedCheckBox.length - 1)!
+                  .dateTimeMonth,
+              dateTimeDay:
+                  openedCheckBox.getAt(openedCheckBox.length - 1)!.dateTimeDay,
             )
           : cityModelDaytimeNow();
       DateTime checkBoxDateTime = DateTime(
@@ -124,13 +133,10 @@ class AirCondition {
               dateTimeMonth: currentTime.month.toString(),
               dateTimeDay: currentTime.day.toString(),
             );
+            final openBox = await Hive.openBox<CityModel>(city);
+
+            await openBox.add(cityModel);
             listOfCityModel.add(cityModel);
-            // openedBox.put('place', cityModel.place);
-            // openedBox.put('airQualityIndex', cityModel.airQualityLevel);
-            // openedBox.put('airQualityLevel', cityModel.airQualityIndex);
-            // openedBox.put('dateTimeYear', cityModel.dateTimeYear);
-            // openedBox.put('dateTimeMonth', cityModel.dateTimeMonth);
-            // openedBox.put('dateTimeDay', cityModel.dateTimeMonth);
             continue;
           } catch (e) {
             log(e.toString());

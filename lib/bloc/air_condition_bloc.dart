@@ -1,10 +1,10 @@
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:cursach_diagrams/hive_models/city_model.dart';
-import 'package:cursach_diagrams/utils/random_facts.dart';
 
+import '../hive_models/city_model.dart';
 import '../utils/air_condition.dart';
+import '../utils/random_facts.dart';
 
 abstract class AirConditionBlocEvent {}
 
