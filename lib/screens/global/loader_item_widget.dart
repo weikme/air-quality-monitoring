@@ -25,7 +25,7 @@ class _LoaderItemWidgetState extends State<LoaderItemWidget>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1000),
       value: 0.5,
     );
     itemScaleAnimation = Tween<double>(
@@ -66,7 +66,7 @@ class _LoaderItemWidgetState extends State<LoaderItemWidget>
           boxShadow: [
             BoxShadow(
               color: widget.color,
-              offset: Offset(0, 0),
+              offset: const Offset(0, 0),
               blurRadius: blurRadiusAnimation.value,
               spreadRadius: 2,
             ),

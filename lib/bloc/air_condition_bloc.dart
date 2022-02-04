@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 
 import '../hive_models/city_model.dart';
+import '../models/random_facts_model.dart';
 import '../utils/air_condition.dart';
 import '../utils/random_facts.dart';
 
@@ -34,25 +35,25 @@ class AirConditionBloc
         List<CityModel>? cityModelList = [];
         try {
           if (event is GetAirConditionValueByIPEvent) {
-            final fact = await _randomFacts.fetchFact();
+            RandomFactsModel? factsModel = await _randomFacts.fetchFact();
 
-            emit(StateLoading(fact ?? ''));
+            emit(StateLoading(factsModel ?? RandomFactsModel(text: '')));
             cityModelList.add((await _airCondition.getAirQualityFromIp())!);
             if (cityModelList.isNotEmpty) {
               emit(StateSuccess(cityModelList));
             }
           } else if (event is GetAirConditionValueByCityEvent) {
-            String? fact = await _randomFacts.fetchFact();
+            RandomFactsModel? factsModel = await _randomFacts.fetchFact();
 
-            emit(StateLoading(fact ?? ''));
+            emit(StateLoading(factsModel ?? RandomFactsModel(text: '')));
             cityModelList = await _airCondition.getAirQualityFromCity();
             if (cityModelList != null && cityModelList.isNotEmpty) {
               emit(StateSuccess(cityModelList));
             }
           } else if (event is ReacquireAirConditionValueByCityEvent) {
-            final fact = await _randomFacts.fetchFact();
+            RandomFactsModel? factsModel = await _randomFacts.fetchFact();
 
-            emit(StateLoading(fact ?? ''));
+            emit(StateLoading(factsModel ?? RandomFactsModel(text: '')));
             cityModelList = await _airCondition.getAirQualityFromCity(
                 isForceReloaded: false);
             if (cityModelList != null && cityModelList.isNotEmpty) {
@@ -80,9 +81,9 @@ class StateSuccess extends AirConditionBlocState {
 }
 
 class StateLoading extends AirConditionBlocState {
-  final String fact;
+  final RandomFactsModel factsModel;
 
-  StateLoading(this.fact);
+  StateLoading(this.factsModel);
 }
 
 class StateError extends AirConditionBlocState {}

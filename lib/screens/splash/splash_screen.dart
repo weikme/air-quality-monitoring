@@ -1,3 +1,5 @@
+// ignore_for_file: implementation_imports
+
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
 
@@ -31,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Container(
       color: ThemeData.dark().primaryColor,
-      child: LoaderWidget(),
+      child: const LoaderWidget(),
     );
   }
 }

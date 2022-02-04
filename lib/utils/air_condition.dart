@@ -6,7 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../hive_models/city_model.dart';
 
 class AirCondition {
-  List<AirQualityData> _airQualityFromCityList = [];
+  // List<AirQualityData> _airQualityFromCityList = [];
   static const String airToken = 'd91a535bb537fadd1d379df5ecf52bf64e6e263a';
 
   List<String> cities = [

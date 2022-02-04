@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           SplashScreen.id: (BuildContext context) => const SplashScreen(),
           LogInScreen.id: (BuildContext context) => const LogInScreen(),
           HomeScreen.id: (BuildContext context) => HomeScreen(),
-          DetailsScreen.id: (BuildContext context) => DetailsScreen(),
+          DetailsScreen.id: (BuildContext context) => const DetailsScreen(),
         },
       ),
     );
