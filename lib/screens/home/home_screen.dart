@@ -1,3 +1,4 @@
+import 'package:cursach_diagrams/screens/global/time_diagram_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -110,12 +111,11 @@ class HomeScreen extends StatelessWidget {
                         Navigator.pushNamed(context, DetailsScreen.id);
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(16),
+                        //padding: const EdgeInsets.all(8),
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         constraints: const BoxConstraints(
-                          minHeight: 100,
-                        ),
+                            minHeight: 100, maxHeight: 200),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
@@ -123,81 +123,87 @@ class HomeScreen extends StatelessWidget {
                                 ThemeData.dark().primaryColor.withOpacity(0.9),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        child: Stack(
+                          //mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'City: ' +
-                                      (state.airQualityData[index].place ??
-                                          'Unknown'),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w300,
-                                        letterSpacing: 0.2,
-                                        wordSpacing: 0.5,
-                                      ),
-                                ),
-                                textSizer(),
-                                //TODO: remove, add info below on details_screen.dart
-                                // Text(
-                                //   'Quality level: ' +
-                                //       qualityLevel(state.airQualityData[index]
-                                //               .airQualityLevel ??
-                                //           ''),
-                                //   style: Theme.of(context)
-                                //       .textTheme
-                                //       .bodyText1
-                                //       ?.copyWith(
-                                //         fontSize: 16,
-                                //         fontWeight: FontWeight.w300,
-                                //         letterSpacing: 0.2,
-                                //         wordSpacing: 0.5,
-                                //       ),
-                                // ),
-                                // textSizer(),
-                                // Text(
-                                //   'Quality index: ' +
-                                //       (state.airQualityData[index]
-                                //               .airQualityIndex ??
-                                //           'Unknown'),
-                                //   style: Theme.of(context)
-                                //       .textTheme
-                                //       .bodyText1
-                                //       ?.copyWith(
-                                //         fontSize: 16,
-                                //         fontWeight: FontWeight.w300,
-                                //         letterSpacing: 0.2,
-                                //         wordSpacing: 0.5,
-                                //       ),
-                                // ),
-                                textSizer(),
-                                Text(
-                                  'Updated at: ' +
-                                      (state.airQualityData[index].dateTimeDay +
-                                          '.' +
-                                          state.airQualityData[index]
-                                              .dateTimeMonth +
-                                          '.' +
-                                          state.airQualityData[index]
-                                              .dateTimeYear),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      ?.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w300,
-                                        letterSpacing: 0.2,
-                                        wordSpacing: 0.5,
-                                      ),
-                                ),
-                              ],
+                            TimeDiagramWidget(
+                              cityModel: state.airQualityData[index],
                             ),
+                            // Column(
+                            //   crossAxisAlignment: CrossAxisAlignment.start,
+                            //   mainAxisAlignment: MainAxisAlignment.end,
+                            //   children: [
+                            Align(
+                              alignment: const Alignment(0.9, 0.85),
+                              child: Text(
+                                //'City:\n' +
+                                (state.airQualityData[index].place ??
+                                    'Unknown'),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText1
+                                    ?.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                      //wordSpacing: 0.5,
+                                    ),
+                              ),
+                            ),
+                            //TODO: remove, add info below on details_screen.dart
+                            // Text(
+                            //   'Quality level: ' +
+                            //       qualityLevel(state.airQualityData[index]
+                            //               .airQualityLevel ??
+                            //           ''),
+                            //   style: Theme.of(context)
+                            //       .textTheme
+                            //       .bodyText1
+                            //       ?.copyWith(
+                            //         fontSize: 16,
+                            //         fontWeight: FontWeight.w300,
+                            //         letterSpacing: 0.2,
+                            //         wordSpacing: 0.5,
+                            //       ),
+                            // ),
+                            // textSizer(),
+                            // Text(
+                            //   'Quality index: ' +
+                            //       (state.airQualityData[index]
+                            //               .airQualityIndex ??
+                            //           'Unknown'),
+                            //   style: Theme.of(context)
+                            //       .textTheme
+                            //       .bodyText1
+                            //       ?.copyWith(
+                            //         fontSize: 16,
+                            //         fontWeight: FontWeight.w300,
+                            //         letterSpacing: 0.2,
+                            //         wordSpacing: 0.5,
+                            //       ),
+                            // ),
+                            // textSizer(),
+                            // Text(
+                            //   'Updated at: ' +
+                            //       (state.airQualityData[index].dateTimeDay +
+                            //           '.' +
+                            //           state.airQualityData[index]
+                            //               .dateTimeMonth +
+                            //           '.' +
+                            //           state.airQualityData[index]
+                            //               .dateTimeYear),
+                            //   style: Theme.of(context)
+                            //       .textTheme
+                            //       .bodyText1
+                            //       ?.copyWith(
+                            //         fontSize: 16,
+                            //         fontWeight: FontWeight.w300,
+                            //         letterSpacing: 0.2,
+                            //         wordSpacing: 0.5,
+                            //       ),
+                            // ),
+                            //   ],
+                            // ),
                           ],
                         ),
                       ),
