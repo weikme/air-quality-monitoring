@@ -1,9 +1,10 @@
-import 'package:cursach_diagrams/screens/global/time_diagram_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../bloc/air_condition_bloc.dart';
+import '../../hive_models/list_of_city_models.dart';
+import '../global/time_diagram_widget.dart';
 import 'details_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -15,6 +16,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -37,7 +39,15 @@ class HomeScreen extends StatelessWidget {
             child: const Text(
               'Reload',
             ),
-          )
+            style: ButtonStyle(
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.only(bottomRight: Radius.circular(24)),
+                ),
+              ),
+            ),
+          ),
         ],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -75,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          state.factsModel.text!,
+                          'Fun fact: ' + state.factsModel.text!,
                           textAlign: TextAlign.center,
                           style:
                               Theme.of(context).textTheme.bodyText1?.copyWith(
@@ -102,7 +112,7 @@ class HomeScreen extends StatelessWidget {
               }
               if (state is StateSuccess) {
                 return ListView.builder(
-                  itemCount: state.airQualityData.length,
+                  itemCount: state.byCity?.length,
                   itemBuilder: (BuildContext context, int index) {
                     // final List city =
                     //     state.airQualityData[index].place!.split(',');
@@ -111,45 +121,83 @@ class HomeScreen extends StatelessWidget {
                         Navigator.pushNamed(context, DetailsScreen.id);
                       },
                       child: Container(
+                        height: 120,
                         //padding: const EdgeInsets.all(8),
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
-                        constraints: const BoxConstraints(
-                            minHeight: 100, maxHeight: 200),
                         decoration: BoxDecoration(
+                          color: Color(0xff232d37),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color:
                                 ThemeData.dark().primaryColor.withOpacity(0.9),
                           ),
                         ),
-                        child: Stack(
-                          //mainAxisAlignment: MainAxisAlignment.start,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TimeDiagramWidget(
-                              cityModel: state.airQualityData[index],
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'City:\n' +
+                                        (state.byCity?[index].city ??
+                                            'Unknown'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.copyWith(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                          //wordSpacing: 0.5,
+                                        ),
+                                  ),
+                                  Text(
+                                    'Air Quality:\n' +
+                                        qualityLevel(state
+                                                .byCity?[index]
+                                                .listOfCityModels
+                                                .last
+                                                ?.airQualityLevel ??
+                                            ''),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.copyWith(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          letterSpacing: 0.5,
+                                          color: Color(0xff68737d),
+                                          //wordSpacing: 0.5,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 4.0, right: 8),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    maxWidth: width / 2, maxHeight: 100),
+                                child: TimeDiagramWidget(
+                                  cityModelList: state.byCity?[index] ??
+                                      ListOfCityModels(city: 'Unknown'),
+                                  isSmall: true,
+                                ),
+                              ),
                             ),
                             // Column(
                             //   crossAxisAlignment: CrossAxisAlignment.start,
                             //   mainAxisAlignment: MainAxisAlignment.end,
                             //   children: [
-                            Align(
-                              alignment: const Alignment(0.9, 0.85),
-                              child: Text(
-                                //'City:\n' +
-                                (state.airQualityData[index].place ??
-                                    'Unknown'),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyText1
-                                    ?.copyWith(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                      //wordSpacing: 0.5,
-                                    ),
-                              ),
-                            ),
+
                             //TODO: remove, add info below on details_screen.dart
                             // Text(
                             //   'Quality level: ' +

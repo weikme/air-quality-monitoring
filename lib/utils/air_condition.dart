@@ -1,13 +1,15 @@
 import 'dart:developer';
 
 import 'package:air_quality/air_quality.dart';
+import 'package:collection/collection.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../constants.dart';
 import '../hive_models/city_model.dart';
+import '../hive_models/list_of_city_models.dart';
 
 class AirCondition {
-  // List<AirQualityData> _airQualityFromCityList = [];
-  static const String airToken = 'd91a535bb537fadd1d379df5ecf52bf64e6e263a';
+  static const String _airToken = 'd91a535bb537fadd1d379df5ecf52bf64e6e263a';
 
   List<String> cities = [
     'Cherkasy',
@@ -36,125 +38,121 @@ class AirCondition {
     'Zhytomyr',
   ];
 
-  CityModel cityModelDaytimeNow() {
-    DateTime currentTime = DateTime.now();
-    final cityModel = CityModel(
-      dateTimeDay: currentTime.day.toString(),
-      dateTimeMonth: currentTime.month.toString(),
-      dateTimeYear: currentTime.year.toString(),
-    );
-    return cityModel;
-  }
-
   Future<CityModel?> getAirQualityFromIp() async {
     AirQualityData? airQualityFromIp;
     DateTime currentTime = DateTime.now();
 
     CityModel cityModel;
     try {
-      airQualityFromIp = await AirQuality(airToken).feedFromIP();
+      airQualityFromIp = await AirQuality(_airToken).feedFromIP();
       cityModel = CityModel(
-        dateTimeDay: currentTime.day.toString(),
-        dateTimeMonth: currentTime.month.toString(),
-        dateTimeYear: currentTime.year.toString(),
-        place: airQualityFromIp.place,
+        dateTime: currentTime,
         airQualityLevel: airQualityFromIp.airQualityLevel.toString(),
         airQualityIndex: airQualityFromIp.airQualityIndex.toString(),
       );
-      log('${cityModel.place}');
       log('${cityModel.airQualityIndex}');
       log('${cityModel.airQualityLevel}');
     } catch (e) {
       rethrow;
     }
-    if (cityModel.place != null) {
-      return cityModel;
-    }
+
+    return cityModel;
   }
 
   Future<AirQualityData?> _getAirCityData({required String city}) async {
     try {
-      return await AirQuality(airToken).feedFromCity(city);
+      return await AirQuality(_airToken).feedFromCity(city);
     } catch (e) {
       log(e.toString());
     }
   }
 
-  Future<List<CityModel>?> getAirQualityFromCity(
+  Future<List<ListOfCityModels>?> getAirQualityFromCity(
       {bool isForceReloaded = false}) async {
-    List<CityModel> listOfCityModel = [];
-    DateTime currentTime = DateTime.now();
+    final DateTime currentTime = DateTime.now();
 
     try {
-      final openedCheckBox = await Hive.openBox<CityModel>(cities.first);
-      CityModel? checkBoxInfo = openedCheckBox.isNotEmpty
-          ? CityModel(
-              place: openedCheckBox.getAt(openedCheckBox.length - 1)?.place,
-              airQualityIndex: openedCheckBox
-                  .getAt(openedCheckBox.length - 1)
-                  ?.airQualityIndex,
-              airQualityLevel: openedCheckBox
-                  .getAt(openedCheckBox.length - 1)
-                  ?.airQualityLevel,
-              dateTimeYear:
-                  openedCheckBox.getAt(openedCheckBox.length - 1)!.dateTimeYear,
-              dateTimeMonth: openedCheckBox
-                  .getAt(openedCheckBox.length - 1)!
-                  .dateTimeMonth,
-              dateTimeDay:
-                  openedCheckBox.getAt(openedCheckBox.length - 1)!.dateTimeDay,
-            )
-          : cityModelDaytimeNow();
-      DateTime checkBoxDateTime = DateTime(
-          int.parse(checkBoxInfo.dateTimeYear),
-          int.parse(checkBoxInfo.dateTimeMonth),
-          int.parse(checkBoxInfo.dateTimeDay));
-      if (currentTime.difference(checkBoxDateTime).inDays < 2 &&
-          isForceReloaded) {
-        return null;
-      }
-      if (openedCheckBox.isEmpty ||
-          currentTime.difference(checkBoxDateTime).inDays > 5 ||
-          (currentTime.difference(checkBoxDateTime).inDays >= 2 &&
-              isForceReloaded)) {
-        for (String city in cities) {
-          log(city);
-          try {
-            final airQualityData = await _getAirCityData(city: city);
-            if (airQualityData == null) {
-              continue;
+      final openedCheckBox =
+          await Hive.openBox<ListOfCityModels>(airQualityDataBox);
+      if (openedCheckBox.isEmpty) {
+        return fetchCityData();
+      } else {
+        for (final city in cities) {
+          final listOfCityModels = openedCheckBox.get(city);
+          if (listOfCityModels != null) {
+            final CityModel? lastFetchedModel = listOfCityModels
+                .listOfCityModels
+                .firstWhereOrNull((element) => element?.dateTime != null);
+            final DateTime lastFetchedTime =
+                lastFetchedModel?.dateTime ?? DateTime.now();
+            final Duration difference = currentTime.difference(lastFetchedTime);
+            if (difference.inDays > 5) {
+              return fetchCityData();
+            } else if (isForceReloaded && difference.inDays > 2) {
+              return fetchCityData();
+            } else {
+              return fetchLocal();
             }
-            //String cityMy = _getCity(city: airQualityData.place)
-            final cityModel = CityModel(
-              place: city,
-              airQualityIndex: airQualityData.airQualityIndex.toString(),
-              airQualityLevel: airQualityData.airQualityLevel.toString(),
-              dateTimeYear: currentTime.year.toString(),
-              dateTimeMonth: currentTime.month.toString(),
-              dateTimeDay: currentTime.day.toString(),
-            );
-            final openBox = await Hive.openBox<CityModel>(city);
-
-            await openBox.add(cityModel);
-            listOfCityModel.add(cityModel);
-            continue;
-          } catch (e) {
-            log(e.toString());
           }
-          return listOfCityModel;
         }
-      } else if (openedCheckBox.isNotEmpty &&
-          currentTime.difference(checkBoxDateTime).inDays <= 5) {
-        // for (int i = 0; i < cities.length; i++) {
-        //   final openedBox = await Hive.openBox(cities[i]);
-        //
-        //   if (openedBox.isNotEmpty) {
-        //TODO: implement data load from hive
-        //   }
-        // }
       }
     } catch (e) {
-      rethrow;
+      log(e.toString());
+    }
+  }
+
+  Future<List<ListOfCityModels>> fetchLocal() async {
+    List<ListOfCityModels> listOfCityModel = [];
+    final openedCheckBox =
+        await Hive.openBox<ListOfCityModels>(airQualityDataBox);
+    for (String city in cities) {
+      log(city);
+      final model = openedCheckBox.get(city);
+      if (model == null) {
+        continue;
+      } else {
+        listOfCityModel.add(model);
+      }
+    }
+    return listOfCityModel;
+  }
+
+  Future<ListOfCityModels?> fetchOneCity({required String city}) async {
+    try {
+      final openedCheckBox =
+          await Hive.openBox<ListOfCityModels>(airQualityDataBox);
+      final DateTime currentTime = DateTime.now();
+
+      final airQualityData = await _getAirCityData(city: city);
+      if (airQualityData != null) {
+        final ListOfCityModels cityList = openedCheckBox.get(
+          city,
+          defaultValue: ListOfCityModels(city: city),
+        )!;
+        final cityModel = CityModel(
+          airQualityIndex: airQualityData.airQualityIndex.toString(),
+          airQualityLevel: airQualityData.airQualityLevel.toString(),
+          dateTime: currentTime,
+        );
+        cityList.listOfCityModels.add(cityModel);
+        openedCheckBox.put(city, cityList);
+        return cityList;
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<List<ListOfCityModels>> fetchCityData() async {
+    List<ListOfCityModels> listOfCityModel = [];
+    for (String city in cities) {
+      log(city);
+      final model = await fetchOneCity(city: city);
+      if (model == null) {
+        continue;
+      } else {
+        listOfCityModel.add(model);
+      }
     }
     return listOfCityModel;
   }

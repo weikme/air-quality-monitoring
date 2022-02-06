@@ -17,16 +17,19 @@ class ListOfCityModelsAdapter extends TypeAdapter<ListOfCityModels> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ListOfCityModels(
-      listOfCityModels: fields[0] as dynamic,
+      listOfCityModels: (fields[0] as List?)?.cast<CityModel?>(),
+      city: fields[1] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ListOfCityModels obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.listOfCityModels);
+      ..write(obj.listOfCityModels)
+      ..writeByte(1)
+      ..write(obj.city);
   }
 
   @override

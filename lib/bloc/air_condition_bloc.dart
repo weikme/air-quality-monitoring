@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 
 import '../hive_models/city_model.dart';
+import '../hive_models/list_of_city_models.dart';
 import '../models/random_facts_model.dart';
 import '../utils/air_condition.dart';
 import '../utils/random_facts.dart';
@@ -32,32 +33,34 @@ class AirConditionBloc
   AirConditionBloc() : super(AirConditionBlocInitialState()) {
     on<AirConditionBlocEvent>(
       (event, emit) async {
-        List<CityModel>? cityModelList = [];
+        List<ListOfCityModels> cityModelList = [];
+        List<CityModel> cityModel = [];
         try {
           if (event is GetAirConditionValueByIPEvent) {
             RandomFactsModel? factsModel = await _randomFacts.fetchFact();
 
             emit(StateLoading(factsModel ?? RandomFactsModel(text: '')));
-            cityModelList.add((await _airCondition.getAirQualityFromIp())!);
+            cityModel.add((await _airCondition.getAirQualityFromIp())!);
             if (cityModelList.isNotEmpty) {
-              emit(StateSuccess(cityModelList));
+              emit(StateSuccess(byIp: cityModel));
             }
           } else if (event is GetAirConditionValueByCityEvent) {
             RandomFactsModel? factsModel = await _randomFacts.fetchFact();
 
             emit(StateLoading(factsModel ?? RandomFactsModel(text: '')));
-            cityModelList = await _airCondition.getAirQualityFromCity();
-            if (cityModelList != null && cityModelList.isNotEmpty) {
-              emit(StateSuccess(cityModelList));
+            cityModelList = await _airCondition.getAirQualityFromCity() ?? [];
+            if (cityModelList.isNotEmpty) {
+              emit(StateSuccess(byCity: cityModelList));
             }
           } else if (event is ReacquireAirConditionValueByCityEvent) {
             RandomFactsModel? factsModel = await _randomFacts.fetchFact();
 
             emit(StateLoading(factsModel ?? RandomFactsModel(text: '')));
             cityModelList = await _airCondition.getAirQualityFromCity(
-                isForceReloaded: false);
-            if (cityModelList != null && cityModelList.isNotEmpty) {
-              emit(StateSuccess(cityModelList));
+                    isForceReloaded: true) ??
+                [];
+            if (cityModelList.isNotEmpty) {
+              emit(StateSuccess(byCity: cityModelList));
             } else {
               emit(StateLoadingErrorMessage(
                   'Can not reload as 2 days have not expired yet.'));
@@ -75,9 +78,10 @@ class AirConditionBloc
 }
 
 class StateSuccess extends AirConditionBlocState {
-  final List<CityModel> airQualityData;
+  final List<CityModel>? byIp;
+  final List<ListOfCityModels>? byCity;
 
-  StateSuccess(this.airQualityData);
+  StateSuccess({this.byIp, this.byCity});
 }
 
 class StateLoading extends AirConditionBlocState {

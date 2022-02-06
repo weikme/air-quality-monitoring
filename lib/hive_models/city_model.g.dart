@@ -17,31 +17,22 @@ class CityModelAdapter extends TypeAdapter<CityModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return CityModel(
-      place: fields[0] as String?,
-      airQualityLevel: fields[2] as String?,
-      airQualityIndex: fields[1] as String?,
-      dateTimeYear: fields[3] as String,
-      dateTimeMonth: fields[4] as String,
-      dateTimeDay: fields[5] as String,
+      airQualityLevel: fields[1] as String?,
+      airQualityIndex: fields[0] as String?,
+      dateTime: fields[2] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, CityModel obj) {
     writer
-      ..writeByte(6)
-      ..writeByte(0)
-      ..write(obj.place)
-      ..writeByte(1)
-      ..write(obj.airQualityIndex)
-      ..writeByte(2)
-      ..write(obj.airQualityLevel)
       ..writeByte(3)
-      ..write(obj.dateTimeYear)
-      ..writeByte(4)
-      ..write(obj.dateTimeMonth)
-      ..writeByte(5)
-      ..write(obj.dateTimeDay);
+      ..writeByte(0)
+      ..write(obj.airQualityIndex)
+      ..writeByte(1)
+      ..write(obj.airQualityLevel)
+      ..writeByte(2)
+      ..write(obj.dateTime);
   }
 
   @override

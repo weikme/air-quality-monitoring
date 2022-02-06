@@ -5,24 +5,15 @@ part 'city_model.g.dart';
 @HiveType(typeId: 0)
 class CityModel {
   @HiveField(0)
-  String? place;
-  @HiveField(1)
   String? airQualityIndex;
-  @HiveField(2)
+  @HiveField(1)
   String? airQualityLevel;
-  @HiveField(3)
-  String dateTimeYear;
-  @HiveField(4)
-  String dateTimeMonth;
-  @HiveField(5)
-  String dateTimeDay;
+  @HiveField(2)
+  DateTime? dateTime;
 
   CityModel({
-    this.place,
     this.airQualityLevel,
     this.airQualityIndex,
-    required this.dateTimeYear,
-    required this.dateTimeMonth,
-    required this.dateTimeDay,
+    this.dateTime,
   });
 }
