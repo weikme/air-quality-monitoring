@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../hive_models/city_model.dart';
 import '../../hive_models/list_of_city_models.dart';
+import 'air_quality_utils.dart';
 
 class TimeDiagramWidget extends StatelessWidget {
   TimeDiagramWidget({required this.cityModelList, this.isSmall = false});
@@ -19,12 +20,17 @@ class TimeDiagramWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(16),
-        ),
+        borderRadius: isSmall
+            ? const BorderRadius.only(
+                topRight: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              )
+            : BorderRadius.zero,
         color: ThemeData.dark().primaryColor.withOpacity(0.9),
       ),
-      padding: const EdgeInsets.all(8.0),
+      padding: isSmall
+          ? const EdgeInsets.all(8.0)
+          : const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       child: LineChart(
         mainChart(),
         swapAnimationDuration: const Duration(milliseconds: 500),
@@ -36,8 +42,8 @@ class TimeDiagramWidget extends StatelessWidget {
     return LineChartData(
       gridData: FlGridData(
         show: true,
-        drawVerticalLine: true,
-        drawHorizontalLine: true,
+        drawVerticalLine: false,
+        drawHorizontalLine: isSmall ? false : true,
         getDrawingHorizontalLine: (value) {
           return FlLine(
             color: Color(0xff37434d),
@@ -54,13 +60,15 @@ class TimeDiagramWidget extends StatelessWidget {
       titlesData: FlTitlesData(
         ///isSmall - for details_screen.dart
         ///!isSmall - for home_screen.dart
-        show: isSmall ? false : true,
+        show: true,
         bottomTitles: SideTitles(
           showTitles: true,
+          reservedSize: 10,
+          margin: 10,
           getTextStyles: (context, value) => const TextStyle(
             color: Color(0xff68737d),
             fontWeight: FontWeight.bold,
-            fontSize: 14,
+            fontSize: 12,
           ),
 
           ///[value] is basically numbers on top of the graph
@@ -69,29 +77,10 @@ class TimeDiagramWidget extends StatelessWidget {
             debugPrint('bottomTitles $value');
             switch (value.toInt()) {
               case 0:
-                return cityModelList.listOfCityModels[value.toInt()]?.dateTime
-                        .toString() ??
-                    '';
-              case 1:
-                return cityModelList.listOfCityModels[value.toInt()]?.dateTime
-                        .toString() ??
-                    '';
-              case 2:
-                return cityModelList.listOfCityModels[value.toInt()]?.dateTime
-                        .toString() ??
-                    '';
-              case 3:
-                return cityModelList.listOfCityModels[value.toInt()]?.dateTime
-                        .toString() ??
-                    '';
-              case 4:
-                return cityModelList.listOfCityModels[value.toInt()]?.dateTime
-                        .toString() ??
-                    '';
-              case 5:
-                return '04.02.2022';
-              case 8:
-                return '07.02.2022';
+                return getDateFormat(
+                  cityModelList.listOfCityModels[value.toInt()]?.dateTime ??
+                      DateTime.now(),
+                );
             }
             return '';
           },
@@ -99,7 +88,7 @@ class TimeDiagramWidget extends StatelessWidget {
 
         ///right titles are needed as the library is not perfect enough
         rightTitles: SideTitles(
-          showTitles: true,
+          showTitles: isSmall ? false : true,
           reservedSize: 20,
           getTextStyles: (context, value) => const TextStyle(
               color: Color(0xff68737d),
@@ -109,11 +98,15 @@ class TimeDiagramWidget extends StatelessWidget {
             return '';
           },
         ),
+        leftTitles: isSmall ? SideTitles(showTitles: false) : null,
+        topTitles: SideTitles(showTitles: false),
       ),
       borderData: FlBorderData(
         show: true,
-        border: const Border.symmetric(),
-        //border: Border.all(color: const Color(0xff37434d), width: 1)
+        border: const Border(
+          left: BorderSide(color: Color(0xff37434d), width: 2),
+          bottom: BorderSide(color: Color(0xff37434d), width: 2),
+        ),
       ),
       minX: 0,
       maxX: 10,
@@ -156,10 +149,10 @@ class TimeDiagramWidget extends StatelessWidget {
     );
   }
 
-  // double getAirQualityIndex() {
-  //   if (cityModelList.listOfCityModels.first?.airQualityIndex == null) return 0;
-  //   double airQualityIndex = double.parse(
-  //       cityModelList.listOfCityModels.first?.airQualityIndex ?? '0');
-  //   return airQualityIndex;
-  // }
+  double getAirQualityIndex() {
+    if (cityModelList.listOfCityModels.first?.airQualityIndex == null) return 0;
+    double airQualityIndex = double.parse(
+        cityModelList.listOfCityModels.first?.airQualityIndex ?? '0');
+    return airQualityIndex;
+  }
 }

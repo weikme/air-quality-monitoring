@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../bloc/air_condition_bloc.dart';
 import '../../hive_models/list_of_city_models.dart';
+import '../global/air_quality_utils.dart';
 import '../global/time_diagram_widget.dart';
 import 'details_screen.dart';
 
@@ -21,7 +22,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text(
-          'Country - ' + country,
+          'Country - $country',
         ),
         titleTextStyle: Theme.of(context).textTheme.bodyText1?.copyWith(
               fontSize: 16,
@@ -114,144 +115,119 @@ class HomeScreen extends StatelessWidget {
                 return ListView.builder(
                   itemCount: state.byCity?.length,
                   itemBuilder: (BuildContext context, int index) {
-                    // final List city =
-                    //     state.airQualityData[index].place!.split(',');
                     return GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, DetailsScreen.id);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailsScreen(
+                              listOfModels: state.byCity?[index],
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
                         height: 120,
-                        //padding: const EdgeInsets.all(8),
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Color(0xff232d37),
+                          color: const Color(0xff232d37),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color:
-                                ThemeData.dark().primaryColor.withOpacity(0.9),
+                                ThemeData.dark().primaryColor.withOpacity(0.5),
                           ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Padding(
+                            Container(
                               padding: const EdgeInsets.only(left: 8),
+                              width: (width - 36) / 2,
+                              constraints:
+                                  BoxConstraints(maxWidth: (width - 36) / 2),
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'City:\n' +
-                                        (state.byCity?[index].city ??
-                                            'Unknown'),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText1
-                                        ?.copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
-                                          //wordSpacing: 0.5,
-                                        ),
+                                  Flexible(
+                                    child: Text(
+                                      'City:\n' +
+                                          (state.byCity?[index].city ??
+                                              'Unknown'),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          ?.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                            //wordSpacing: 0.5,
+                                          ),
+                                    ),
                                   ),
-                                  Text(
-                                    'Air Quality:\n' +
-                                        qualityLevel(state
-                                                .byCity?[index]
-                                                .listOfCityModels
-                                                .last
-                                                ?.airQualityLevel ??
-                                            ''),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText1
-                                        ?.copyWith(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          letterSpacing: 0.5,
-                                          color: Color(0xff68737d),
-                                          //wordSpacing: 0.5,
+                                  Flexible(
+                                    child: Wrap(
+                                      alignment: WrapAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      runAlignment: WrapAlignment.center,
+                                      spacing: 0,
+                                      runSpacing: 0,
+                                      children: [
+                                        Text(
+                                          'Air Quality: ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1
+                                              ?.copyWith(
+                                                letterSpacing: 0.5,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                color: const Color(0xff68737d),
+                                              ),
                                         ),
+                                        Text(
+                                          qualityLevel(state
+                                                  .byCity?[index]
+                                                  .listOfCityModels
+                                                  .last
+                                                  ?.airQualityLevel ??
+                                              ''),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1
+                                              ?.copyWith(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                //letterSpacing: 0.5,
+                                                color: qualityLevelColor(state
+                                                        .byCity?[index]
+                                                        .listOfCityModels
+                                                        .last
+                                                        ?.airQualityLevel ??
+                                                    ''),
+                                              ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 4.0, right: 8),
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    maxWidth: width / 2, maxHeight: 100),
-                                child: TimeDiagramWidget(
-                                  cityModelList: state.byCity?[index] ??
-                                      ListOfCityModels(city: 'Unknown'),
-                                  isSmall: true,
-                                ),
+                            Container(
+                              width: (width - 32) / 2,
+                              constraints: const BoxConstraints(
+                                  //maxWidth: (width - 32) / 2,
+                                  maxHeight: 100),
+                              child: TimeDiagramWidget(
+                                cityModelList: state.byCity?[index] ??
+                                    ListOfCityModels(city: 'Unknown'),
+                                isSmall: true,
                               ),
                             ),
-                            // Column(
-                            //   crossAxisAlignment: CrossAxisAlignment.start,
-                            //   mainAxisAlignment: MainAxisAlignment.end,
-                            //   children: [
-
-                            //TODO: remove, add info below on details_screen.dart
-                            // Text(
-                            //   'Quality level: ' +
-                            //       qualityLevel(state.airQualityData[index]
-                            //               .airQualityLevel ??
-                            //           ''),
-                            //   style: Theme.of(context)
-                            //       .textTheme
-                            //       .bodyText1
-                            //       ?.copyWith(
-                            //         fontSize: 16,
-                            //         fontWeight: FontWeight.w300,
-                            //         letterSpacing: 0.2,
-                            //         wordSpacing: 0.5,
-                            //       ),
-                            // ),
-                            // textSizer(),
-                            // Text(
-                            //   'Quality index: ' +
-                            //       (state.airQualityData[index]
-                            //               .airQualityIndex ??
-                            //           'Unknown'),
-                            //   style: Theme.of(context)
-                            //       .textTheme
-                            //       .bodyText1
-                            //       ?.copyWith(
-                            //         fontSize: 16,
-                            //         fontWeight: FontWeight.w300,
-                            //         letterSpacing: 0.2,
-                            //         wordSpacing: 0.5,
-                            //       ),
-                            // ),
-                            // textSizer(),
-                            // Text(
-                            //   'Updated at: ' +
-                            //       (state.airQualityData[index].dateTimeDay +
-                            //           '.' +
-                            //           state.airQualityData[index]
-                            //               .dateTimeMonth +
-                            //           '.' +
-                            //           state.airQualityData[index]
-                            //               .dateTimeYear),
-                            //   style: Theme.of(context)
-                            //       .textTheme
-                            //       .bodyText1
-                            //       ?.copyWith(
-                            //         fontSize: 16,
-                            //         fontWeight: FontWeight.w300,
-                            //         letterSpacing: 0.2,
-                            //         wordSpacing: 0.5,
-                            //       ),
-                            // ),
-                            //   ],
-                            // ),
                           ],
                         ),
                       ),
@@ -272,40 +248,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  String qualityLevel(String airQualityLevel) {
-    switch (airQualityLevel) {
-      case 'AirQualityLevel.GOOD':
-        return 'Good';
-      case 'AirQualityLevel.HAZARDOUS':
-        return 'Hazardous';
-      case 'AirQualityLevel.VERY_UNHEALTHY':
-        return 'Very Unhealthy';
-      case 'AirQualityLevel.MODERATE':
-        return 'Moderate';
-      case 'AirQualityLevel.UNHEALTHY':
-        return 'Unhealthy';
-      case 'AirQualityLevel.UNHEALTHY_FOR_SENSITIVE_GROUPS':
-        return 'Unhealthy for sensitive groups';
-      case 'AirQualityLevel.UNKNOWN':
-        return 'Unknown';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  final TextStyle? cityInfoTextTheme = const TextTheme().bodyText1?.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w300,
-        // letterSpacing: 0.2,
-        wordSpacing: 0.5,
-      );
-
-  Widget textSizer() {
-    return const SizedBox(
-      height: 4,
     );
   }
 }
